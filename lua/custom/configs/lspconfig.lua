@@ -12,6 +12,17 @@ lspconfig.clangd.setup {
   capabilities = capabilities,
 }
 
+lspconfig.verible.setup {
+  on_attach = function(client, bufnr)
+    client.server_capabilities.signaturehelpprovider = false
+    on_attach(client, bufnr)
+  end,
+  cmd = {'verible-verilog-ls', '--rules_config_search'},
+  filetypes = { "systemverilog", "verilog" },
+  capabilities = capabilities,
+  root_dir = function() return vim.uv.cwd() end
+}
+
 lspconfig.lua_ls.setup {
   on_init = function(client)
     local path = client.workspace_folders[1].name

@@ -61,4 +61,6 @@ require("lspconfig").lua_ls.setup {
   },
 }
 
+require'lspconfig'.leanls.setup{}
+
 return M

@@ -2,7 +2,8 @@ local options = {
   ensure_installed = {
         "lua",
         "cpp",
-        "c"
+        "c",
+        "verilog"
 },
 
   highlight = {

@@ -1,41 +1,5 @@
 local plugins = {
   {
-    "rcarriga/nvim-dap-ui",
-    event = "VeryLazy",
-    dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"},
-    config = function()
-      local dap = require("dap")
-      local dapui = require("dapui")
-      dapui.setup()
-      dap.listeners.after.event_initialized["dapui_config"] = function()
-        dapui.open()
-      end
-      dap.listeners.before.event_terminated["dapui_config"] = function()
-        dapui.close()
-      end
-      dap.listeners.before.event_exited["dapui_config"] = function()
-        dapui.close()
-      end
-    end
-  },
-  {
-    "jay-babu/mason-nvim-dap.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "williamboman/mason.nvim",
-      "mfussenegger/nvim-dap",
-    },
-    opts = {
-      handlers = {}
-    },
-  },
-  {
-    "mfussenegger/nvim-dap",
-    config = function(_, _)
-      require("core.utils").load_mappings("dap")
-    end
-  },
-  {
     "neovim/nvim-lspconfig",
     config = function()
       require "plugins.configs.lspconfig"
@@ -82,103 +46,6 @@ local plugins = {
     "thirtythreeforty/lessspace.vim",
     event = "VeryLazy",
   },
-  -- {
-  --   "kdheepak/lazygit.nvim",
-  --   cmd = {
-  --     "LazyGit",
-  --     "LazyGitConfig",
-  --     "LazyGitCurrentFile",
-  --     "LazyGitFilter",
-  --     "LazyGitFilterCurrentFile",
-  --   },
-  --   -- optional for floating window border decoration
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim",
-  --   },
-  -- },
-  {
-    "Julian/lean.nvim",
-    event = { 'BufReadPre *.lean', 'BufNewFile *.lean' },
-
-    dependencies = {
-      'neovim/nvim-lspconfig',
-      'nvim-lua/plenary.nvim',
-      -- you also will likely want nvim-cmp or some completion engine
-    },
-    opts = {
-      -- Enable the Lean language server(s)?
-      --
-      -- false to disable, otherwise should be a table of options to pass to `leanls`
-      --
-      -- See https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#leanls for details.
-      -- In particular ensure you have followed instructions setting up a callback
-      -- for `LspAttach` which sets your key bindings!
-      lsp = {
-            init_options = {
-              -- See Lean.Lsp.InitializationOptions for details and further options.
-              -- Time (in milliseconds) which must pass since latest edit until elaboration begins.
-              -- Lower values may make editing feel faster at the cost of higher CPU usage.
-              -- Note that lean.nvim changes the Lean default for this value!
-              editDelay = 0,
-              -- Whether to signal that widgets are supported.
-              hasWidgets = true,
-            }
-      },
-
-        -- Abbreviation support
-        abbreviations = {
-          -- Enable expanding of unicode abbreviations?
-          enable = true,
-          -- additional abbreviations:
-          extra = {
-            -- Add a \wknight abbreviation to insert ♘
-            --
-            -- Note that the backslash is implied, and that you of
-            -- course may also use a snippet engine directly to do
-            -- this if so desired.
-            wknight = '♘',
-          },
-          -- Change if you don't like the backslash
-          -- (comma is a popular choice on French keyboards)
-          leader = '\\',
-        },
-
-        -- Enable suggested mappings?
-        --
-        -- false by default, true to enable
-        mappings = true,
-
-        -- Infoview support
-        infoview = {
-          -- Automatically open an infoview on entering a Lean buffer?
-          -- Should be a function that will be called anytime a new Lean file
-          -- is opened. Return true to open an infoview, otherwise false.
-          -- Setting this to `true` is the same as `function() return true end`,
-          -- i.e. autoopen for any Lean file, or setting it to `false` is the
-          -- same as `function() return false end`, i.e. never autoopen.
-          autoopen = true,
-
-          -- Set infoview windows' starting dimensions.
-          -- Windows are opened horizontally or vertically depending on spacing.
-          width = 50,
-          height = 20,
-
-          -- Put the infoview on the top or bottom when horizontal?
-          -- top | bottom
-          horizontal_position = "bottom",
-
-          -- Always open the infoview window in a separate tabpage.
-          -- Might be useful if you are using a screen reader and don't want too
-          -- many dynamic updates in the terminal at the same time.
-          -- Note that `height` and `width` will be ignored in this case.
-          separate_tab = false,
-
-          -- Show indicators for pin locations when entering an infoview window?
-          -- always | never | auto (= only when there are multiple pins)
-          indicators = "auto",
-        },
-     },
-  },
   {
     'dgagn/diagflow.nvim',
     event = 'LspAttach',
@@ -215,6 +82,34 @@ local plugins = {
         vertical = "│"
       },
       show_borders = true,}
-  }
+  },
+  {
+    "rmagatti/goto-preview",
+    event = "BufEnter",
+    config = true, -- necessary as per https://github.com/rmagatti/goto-preview/issues/88
+    opts = {
+      width = 120, -- Width of the floating window
+      height = 15, -- Height of the floating window
+      border = {"↖", "─" ,"┐", "│", "┘", "─", "└", "│"}, -- Border characters of the floating window
+      default_mappings = true, -- Bind default mappings
+      debug = false, -- Print debug information
+      opacity = nil, -- 0-100 opacity level of the floating window where 100 is fully transparent.
+      resizing_mappings = false, -- Binds arrow keys to resizing the floating window.
+      post_open_hook = nil, -- A function taking two arguments, a buffer and a window to be ran as a hook.
+      post_close_hook = nil, -- A function taking two arguments, a buffer and a window to be ran as a hook.
+      references = { -- Configure the telescope UI for slowing the references cycling window.
+        telescope = require("telescope.themes").get_dropdown({ hide_preview = false })
+      },
+      -- These two configs can also be passed down to the goto-preview definition and implementation calls for one off "peak" functionality.
+      focus_on_open = true, -- Focus the floating window when opening it.
+      dismiss_on_move = false, -- Dismiss the floating window when moving the cursor.
+      force_close = true, -- passed into vim.api.nvim_win_close's second argument. See :h nvim_win_close
+      bufhidden = "wipe", -- the bufhidden option to set on the floating window. See :h bufhidden
+      stack_floating_preview_windows = true, -- Whether to nest floating windows
+      preview_window_title = { enable = true, position = "left" }, -- Whether to set the preview window title as the filename
+      zindex = 1, -- Starting zindex for the stack of floating windows
+      }
+  },
 }
+
 return plugins
